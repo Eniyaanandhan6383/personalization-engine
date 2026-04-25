@@ -14,7 +14,7 @@ router = APIRouter(tags=["tracking"])
 bearer = HTTPBearer()
 SECRET_KEY = os.getenv("SECRET_KEY", "changethis")
 ALGORITHM = "HS256"
-print(f"[DEBUG] SECRET_KEY loaded as: {SECRET_KEY}")
+
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer), db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
