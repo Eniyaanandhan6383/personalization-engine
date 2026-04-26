@@ -7,26 +7,35 @@ load_dotenv()
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "")
 
 CATEGORY_QUERIES = {
-    "tech":    "python programming tutorial 2025",
-    "sports":  "football highlights 2025",
-    "finance": "stock market investing 2025",
-    "health":  "workout fitness guide 2025",
+    "tech":      "programming tutorial 2025",
+    "sports":    "sports highlights 2025",
+    "finance":   "personal finance investing 2025",
+    "health":    "workout fitness health 2025",
+    "gaming":    "gaming gameplay 2025",
+    "music":     "music hits 2025",
+    "education": "educational learning tutorial 2025",
+    "food":      "cooking recipes food 2025",
+    "travel":    "travel vlog destinations 2025",
+    "fashion":   "fashion style outfit 2025",
+    "news":      "world news today 2025",
+    "science":   "science explained 2025",
 }
 
 async def fetch_youtube_videos(category: str, max_results: int = 5) -> list:
     if not YOUTUBE_API_KEY:
-        return []  # falls back to seeded content automatically
+        return []
 
-    query = CATEGORY_QUERIES.get(category, category)
+    query = CATEGORY_QUERIES.get(category, f"{category} 2025")
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
-        "part": "snippet",
-        "q": query,
-        "type": "video",
-        "maxResults": max_results,
-        "key": YOUTUBE_API_KEY,
-        "relevanceLanguage": "en",
-        "safeSearch": "moderate"
+        "part":             "snippet",
+        "q":                query,
+        "type":             "video",
+        "maxResults":       max_results,
+        "key":              YOUTUBE_API_KEY,
+        "relevanceLanguage":"en",
+        "safeSearch":       "moderate",
+        "videoDuration":    "medium",
     }
 
     try:

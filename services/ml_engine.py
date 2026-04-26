@@ -6,41 +6,101 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 import json
 
-CATEGORIES = ["tech", "sports", "finance", "health"]
+
 N_CLUSTERS = 3
 
-# ─── Seeded content catalogue (fallback when no YouTube API key) ───────────────
+CATEGORIES = [
+    "tech", "sports", "finance", "health",
+    "gaming", "music", "education", "food",
+    "travel", "fashion", "news", "science"
+]
+
 SEEDED_CONTENT = {
     "tech": [
-        {"content_id": "c001", "title": "Python async explained",       "category": "tech",    "source": "seeded", "url": "https://example.com/c001"},
-        {"content_id": "c002", "title": "React hooks deep dive",        "category": "tech",    "source": "seeded", "url": "https://example.com/c002"},
-        {"content_id": "c003", "title": "System design for beginners",  "category": "tech",    "source": "seeded", "url": "https://example.com/c003"},
-        {"content_id": "c004", "title": "FastAPI full course 2025",     "category": "tech",    "source": "seeded", "url": "https://example.com/c004"},
-        {"content_id": "c005", "title": "AWS for developers",           "category": "tech",    "source": "seeded", "url": "https://example.com/c005"},
+        {"content_id": "c001", "title": "Python async explained",        "category": "tech",      "source": "seeded", "url": "https://example.com/c001"},
+        {"content_id": "c002", "title": "React hooks deep dive",         "category": "tech",      "source": "seeded", "url": "https://example.com/c002"},
+        {"content_id": "c003", "title": "System design for beginners",   "category": "tech",      "source": "seeded", "url": "https://example.com/c003"},
+        {"content_id": "c004", "title": "FastAPI full course 2025",      "category": "tech",      "source": "seeded", "url": "https://example.com/c004"},
+        {"content_id": "c005", "title": "AWS for developers",            "category": "tech",      "source": "seeded", "url": "https://example.com/c005"},
     ],
     "sports": [
-        {"content_id": "c006", "title": "Chelsea vs Arsenal highlights","category": "sports",  "source": "seeded", "url": "https://example.com/c006"},
-        {"content_id": "c007", "title": "IPL 2025 match recap",         "category": "sports",  "source": "seeded", "url": "https://example.com/c007"},
-        {"content_id": "c008", "title": "NBA playoffs best moments",    "category": "sports",  "source": "seeded", "url": "https://example.com/c008"},
-        {"content_id": "c009", "title": "Cricket World Cup analysis",   "category": "sports",  "source": "seeded", "url": "https://example.com/c009"},
-        {"content_id": "c010", "title": "F1 2025 season highlights",    "category": "sports",  "source": "seeded", "url": "https://example.com/c010"},
+        {"content_id": "c006", "title": "Chelsea vs Arsenal highlights", "category": "sports",    "source": "seeded", "url": "https://example.com/c006"},
+        {"content_id": "c007", "title": "IPL 2025 match recap",          "category": "sports",    "source": "seeded", "url": "https://example.com/c007"},
+        {"content_id": "c008", "title": "NBA playoffs best moments",     "category": "sports",    "source": "seeded", "url": "https://example.com/c008"},
+        {"content_id": "c009", "title": "Cricket World Cup analysis",    "category": "sports",    "source": "seeded", "url": "https://example.com/c009"},
+        {"content_id": "c010", "title": "F1 2025 season highlights",     "category": "sports",    "source": "seeded", "url": "https://example.com/c010"},
     ],
     "finance": [
-        {"content_id": "c011", "title": "How to invest at 22",          "category": "finance", "source": "seeded", "url": "https://example.com/c011"},
-        {"content_id": "c012", "title": "Bitcoin market analysis",      "category": "finance", "source": "seeded", "url": "https://example.com/c012"},
-        {"content_id": "c013", "title": "Zerodha beginners guide",      "category": "finance", "source": "seeded", "url": "https://example.com/c013"},
-        {"content_id": "c014", "title": "Mutual funds explained",       "category": "finance", "source": "seeded", "url": "https://example.com/c014"},
-        {"content_id": "c015", "title": "Personal finance in your 20s", "category": "finance", "source": "seeded", "url": "https://example.com/c015"},
+        {"content_id": "c011", "title": "How to invest at 22",           "category": "finance",   "source": "seeded", "url": "https://example.com/c011"},
+        {"content_id": "c012", "title": "Bitcoin market analysis",       "category": "finance",   "source": "seeded", "url": "https://example.com/c012"},
+        {"content_id": "c013", "title": "Zerodha beginners guide",       "category": "finance",   "source": "seeded", "url": "https://example.com/c013"},
+        {"content_id": "c014", "title": "Mutual funds explained",        "category": "finance",   "source": "seeded", "url": "https://example.com/c014"},
+        {"content_id": "c015", "title": "Personal finance in your 20s",  "category": "finance",   "source": "seeded", "url": "https://example.com/c015"},
     ],
     "health": [
-        {"content_id": "c016", "title": "10-minute HIIT workout",       "category": "health",  "source": "seeded", "url": "https://example.com/c016"},
-        {"content_id": "c017", "title": "Mediterranean diet guide",     "category": "health",  "source": "seeded", "url": "https://example.com/c017"},
-        {"content_id": "c018", "title": "Sleep and productivity",       "category": "health",  "source": "seeded", "url": "https://example.com/c018"},
-        {"content_id": "c019", "title": "Mental health for developers", "category": "health",  "source": "seeded", "url": "https://example.com/c019"},
-        {"content_id": "c020", "title": "Yoga for beginners",           "category": "health",  "source": "seeded", "url": "https://example.com/c020"},
+        {"content_id": "c016", "title": "10-minute HIIT workout",        "category": "health",    "source": "seeded", "url": "https://example.com/c016"},
+        {"content_id": "c017", "title": "Mediterranean diet guide",      "category": "health",    "source": "seeded", "url": "https://example.com/c017"},
+        {"content_id": "c018", "title": "Sleep and productivity",        "category": "health",    "source": "seeded", "url": "https://example.com/c018"},
+        {"content_id": "c019", "title": "Mental health for developers",  "category": "health",    "source": "seeded", "url": "https://example.com/c019"},
+        {"content_id": "c020", "title": "Yoga for beginners",            "category": "health",    "source": "seeded", "url": "https://example.com/c020"},
+    ],
+    "gaming": [
+        {"content_id": "c021", "title": "GTA 6 gameplay reveal",         "category": "gaming",    "source": "seeded", "url": "https://example.com/c021"},
+        {"content_id": "c022", "title": "Valorant pro tips 2025",        "category": "gaming",    "source": "seeded", "url": "https://example.com/c022"},
+        {"content_id": "c023", "title": "Best PC builds under 50k",      "category": "gaming",    "source": "seeded", "url": "https://example.com/c023"},
+        {"content_id": "c024", "title": "Minecraft survival guide",      "category": "gaming",    "source": "seeded", "url": "https://example.com/c024"},
+        {"content_id": "c025", "title": "Top 10 games of 2025",          "category": "gaming",    "source": "seeded", "url": "https://example.com/c025"},
+    ],
+    "music": [
+        {"content_id": "c026", "title": "Guitar for beginners 2025",     "category": "music",     "source": "seeded", "url": "https://example.com/c026"},
+        {"content_id": "c027", "title": "How to mix beats at home",      "category": "music",     "source": "seeded", "url": "https://example.com/c027"},
+        {"content_id": "c028", "title": "Top Hindi songs April 2025",    "category": "music",     "source": "seeded", "url": "https://example.com/c028"},
+        {"content_id": "c029", "title": "Music theory in 20 minutes",    "category": "music",     "source": "seeded", "url": "https://example.com/c029"},
+        {"content_id": "c030", "title": "Lofi hip hop study playlist",   "category": "music",     "source": "seeded", "url": "https://example.com/c030"},
+    ],
+    "education": [
+        {"content_id": "c031", "title": "How to study effectively",      "category": "education", "source": "seeded", "url": "https://example.com/c031"},
+        {"content_id": "c032", "title": "UPSC preparation strategy",     "category": "education", "source": "seeded", "url": "https://example.com/c032"},
+        {"content_id": "c033", "title": "Learn SQL in one hour",         "category": "education", "source": "seeded", "url": "https://example.com/c033"},
+        {"content_id": "c034", "title": "Top online courses 2025",       "category": "education", "source": "seeded", "url": "https://example.com/c034"},
+        {"content_id": "c035", "title": "How to read faster",            "category": "education", "source": "seeded", "url": "https://example.com/c035"},
+    ],
+    "food": [
+        {"content_id": "c036", "title": "Biryani recipe from scratch",   "category": "food",      "source": "seeded", "url": "https://example.com/c036"},
+        {"content_id": "c037", "title": "5 healthy breakfast ideas",     "category": "food",      "source": "seeded", "url": "https://example.com/c037"},
+        {"content_id": "c038", "title": "Street food tour Chennai",      "category": "food",      "source": "seeded", "url": "https://example.com/c038"},
+        {"content_id": "c039", "title": "Protein rich meals under 200",  "category": "food",      "source": "seeded", "url": "https://example.com/c039"},
+        {"content_id": "c040", "title": "Baking bread for beginners",    "category": "food",      "source": "seeded", "url": "https://example.com/c040"},
+    ],
+    "travel": [
+        {"content_id": "c041", "title": "Best places in Tamil Nadu",     "category": "travel",    "source": "seeded", "url": "https://example.com/c041"},
+        {"content_id": "c042", "title": "Budget travel Europe 2025",     "category": "travel",    "source": "seeded", "url": "https://example.com/c042"},
+        {"content_id": "c043", "title": "Solo travel tips for India",    "category": "travel",    "source": "seeded", "url": "https://example.com/c043"},
+        {"content_id": "c044", "title": "Hidden gems in Southeast Asia", "category": "travel",    "source": "seeded", "url": "https://example.com/c044"},
+        {"content_id": "c045", "title": "Travel vlog Bali 2025",         "category": "travel",    "source": "seeded", "url": "https://example.com/c045"},
+    ],
+    "fashion": [
+        {"content_id": "c046", "title": "Men's style guide 2025",        "category": "fashion",   "source": "seeded", "url": "https://example.com/c046"},
+        {"content_id": "c047", "title": "Budget outfit ideas India",     "category": "fashion",   "source": "seeded", "url": "https://example.com/c047"},
+        {"content_id": "c048", "title": "Skincare routine for men",      "category": "fashion",   "source": "seeded", "url": "https://example.com/c048"},
+        {"content_id": "c049", "title": "How to dress for interview",    "category": "fashion",   "source": "seeded", "url": "https://example.com/c049"},
+        {"content_id": "c050", "title": "Thrift shopping guide",         "category": "fashion",   "source": "seeded", "url": "https://example.com/c050"},
+    ],
+    "news": [
+        {"content_id": "c051", "title": "India economy update 2025",     "category": "news",      "source": "seeded", "url": "https://example.com/c051"},
+        {"content_id": "c052", "title": "AI regulation news this week",  "category": "news",      "source": "seeded", "url": "https://example.com/c052"},
+        {"content_id": "c053", "title": "Global climate report 2025",    "category": "news",      "source": "seeded", "url": "https://example.com/c053"},
+        {"content_id": "c054", "title": "Tech layoffs and hiring trends", "category": "news",     "source": "seeded", "url": "https://example.com/c054"},
+        {"content_id": "c055", "title": "Election results analysis",     "category": "news",      "source": "seeded", "url": "https://example.com/c055"},
+    ],
+    "science": [
+        {"content_id": "c056", "title": "James Webb telescope findings", "category": "science",   "source": "seeded", "url": "https://example.com/c056"},
+        {"content_id": "c057", "title": "How black holes work",          "category": "science",   "source": "seeded", "url": "https://example.com/c057"},
+        {"content_id": "c058", "title": "AI and the future of biology",  "category": "science",   "source": "seeded", "url": "https://example.com/c058"},
+        {"content_id": "c059", "title": "Quantum computing explained",   "category": "science",   "source": "seeded", "url": "https://example.com/c059"},
+        {"content_id": "c060", "title": "Climate science deep dive",     "category": "science",   "source": "seeded", "url": "https://example.com/c060"},
     ],
 }
-
 
 def get_user_feature_vector(user_id: str, db) -> np.ndarray:
     """Convert a user's behavior logs into a numeric feature vector."""
