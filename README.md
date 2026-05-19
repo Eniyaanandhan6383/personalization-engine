@@ -104,9 +104,8 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
  🌐 Live API
 
-* Base URL: `http://54.85.206.159:8000`
-* API Docs: `http://54.85.206.159:8000/docs`
-
+Base URL: http://<your-ec2-ip>:8000
+API Docs: http://<your-ec2-ip>:8000/docs
 
 
 👥 Team & Contributions
